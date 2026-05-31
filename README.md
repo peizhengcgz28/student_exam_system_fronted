@@ -1,73 +1,55 @@
-# React + TypeScript + Vite
+# 学生作答系统 - 前端服务
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- 基于 React + TypeScript 的单页应用，提供学生端考试作答与教师端管理界面。
 
-Currently, two official plugins are available:
+## 技术栈 (参考)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 24 + TypeScript
+- Vite
+- Ant Design 5
+- React Router 6
+- Zustand (状态管理)
+- Axios
+- Recharts (图表)
+- React Beautiful DnD (拖拽排序)
 
-## React Compiler
+## 项目结构 (参考)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+frontend/
+├── public/
+├── src/
+│ ├── assets/ # 静态资源
+│ ├── components/ # 公共组件
+│ ├── hooks/ # 自定义 Hook
+│ ├── pages/ # 页面
+│ │ ├── auth/ # 登录/注册
+│ │ ├── student/ # 学生端（试卷、作答、成绩）
+│ │ ├── teacher/ # 教师端（题库、试卷、成绩、智能导入）
+│ ├── services/ # API 请求封装
+│ ├── store/ # 全局状态
+│ ├── router/ # 路由配置
+│ ├── types/ # TypeScript 类型定义
+│ ├── utils/ # 工具函数
+│ ├── App.tsx
+│ └── main.tsx
+├── .env.example
+├── package.json
+└── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 环境准备
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **安装依赖**
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+``` 
+   
+
+2. 环境变量
+- .env：
+
+```ini
+VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
