@@ -53,3 +53,9 @@ npm install
 ```ini
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
+
+3. 启动开发服务器
+
+```bash
+npm run dev
+```

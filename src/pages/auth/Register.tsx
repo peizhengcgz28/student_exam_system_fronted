@@ -98,6 +98,7 @@ const onFinish = async (values: any) => {
               options={[
                 { value: 'student', label: '学生' },
                 { value: 'teacher', label: '教师' },
+                { value: 'teacher', label: '管理员' },
               ]} 
             />
           </Form.Item>
