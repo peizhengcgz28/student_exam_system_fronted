@@ -1,61 +1,73 @@
-# 学生作答系统 - 前端服务
+# React + TypeScript + Vite
 
-- 基于 React + TypeScript 的单页应用，提供学生端考试作答与教师端管理界面。
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 技术栈 (参考)
+Currently, two official plugins are available:
 
-- React 24 + TypeScript
-- Vite
-- Ant Design 5
-- React Router 6
-- Zustand (状态管理)
-- Axios
-- Recharts (图表)
-- React Beautiful DnD (拖拽排序)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## 项目结构 (参考)
+## React Compiler
 
-```
-frontend/
-├── public/
-├── src/
-│ ├── assets/ # 静态资源
-│ ├── components/ # 公共组件
-│ ├── hooks/ # 自定义 Hook
-│ ├── pages/ # 页面
-│ │ ├── auth/ # 登录/注册
-│ │ ├── student/ # 学生端（试卷、作答、成绩）
-│ │ ├── teacher/ # 教师端（题库、试卷、成绩、智能导入）
-│ ├── services/ # API 请求封装
-│ ├── store/ # 全局状态
-│ ├── router/ # 路由配置
-│ ├── types/ # TypeScript 类型定义
-│ ├── utils/ # 工具函数
-│ ├── App.tsx
-│ └── main.tsx
-├── .env.example
-├── package.json
-└── README.md
-```
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 环境准备
+## Expanding the ESLint configuration
 
-1. **安装依赖**
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```bash
-npm install
-``` 
-   
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-2. 环境变量
-- .env：
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-```ini
-VITE_API_BASE_URL=http://localhost:8000/api/v1
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-3. 启动开发服务器
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```bash
-npm run dev
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
