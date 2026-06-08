@@ -4,12 +4,16 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { authAPI } from '@/services/auth'
 import { useState } from 'react'
 
-export default function Login() {
+interface LoginProps {
+  isAdminLogin?: boolean
+}
+
+export default function Login({ isAdminLogin = false }: LoginProps) {
   const navigate = useNavigate()
   const login = useAuthStore((state) => state.login)
   const [loading, setLoading] = useState(false)
-  // 默认选中学生身份
-  const [userRole, setUserRole] = useState<'student' | 'teacher' | 'admin'>('student')
+  //管理员登录时默认选中管理员身份，否则默认选中学生身份
+  const [userRole, setUserRole] = useState<'student' | 'teacher' | 'admin'>(isAdminLogin ? 'admin' : 'student')
 
   const onFinish = async (values: any) => {
     setLoading(true)
@@ -55,8 +59,8 @@ export default function Login() {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f0f2f5' }}>
-      <Card 
-        title="用户登录" 
+      <Card
+        title={isAdminLogin ? "管理员登录" : "用户登录"}
         style={{ width: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
       >
           <Form onFinish={onFinish} layout="vertical">
@@ -92,19 +96,33 @@ export default function Login() {
           </Form.Item>
           
           {/* 角色选择下拉框 */}
-          <Form.Item label="登录身份">
-            <Select
-              value={userRole}
-              onChange={setUserRole}
-              size="large"
-              style={{ width: '100%' }}
-              options={[
-                { label: '学生', value: 'student' },
-                { label: '教师', value: 'teacher' },
-                { label: '管理员', value: 'admin' }
-              ]}
-            />
-          </Form.Item>
+          {isAdminLogin ? (
+            //管理员登录页面只显示管理员选项
+            <Form.Item label="登录身份">
+              <Select
+                value="admin"
+                size="large"
+                style={{ width: '100%' }}
+                options={[
+                  { label: '管理员', value: 'admin' }
+                ]}
+              />
+            </Form.Item>
+          ) : (
+            // 普通登录页面显示学生和教师选项
+            <Form.Item label="登录身份">
+              <Select
+                value={userRole}
+                onChange={setUserRole}
+                size="large"
+                style={{ width: '100%' }}
+                options={[
+                  { label: '学生', value: 'student' },
+                  { label: '教师', value: 'teacher' }
+                ]}
+              />
+            </Form.Item>
+          )}
           
           <Form.Item>
             <Button type="primary" htmlType="submit" block size="large" loading={loading}>

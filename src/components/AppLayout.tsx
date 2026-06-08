@@ -39,11 +39,10 @@ const getMenuItems = (role: string): MenuProps['items'] => {
   return menuMap[role] || []
 }
 
-// 角色切换选项
+// 角色切换选项（仅保留学生和教师）
 const roleOptions = [
   { key: 'student', label: '学生端' },
   { key: 'teacher', label: '教师端' },
-  { key: 'admin', label: '管理员' },
 ]
 
 export default function AppLayout() {

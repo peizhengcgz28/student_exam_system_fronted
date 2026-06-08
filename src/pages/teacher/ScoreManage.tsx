@@ -1,87 +1,109 @@
 import { useEffect, useState } from 'react'
-import { Table, Card, Select, Space, Button } from 'antd'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import request from '@/utils/request'
-import type { Score } from '@/types'
+import { Table, Card, Select, Space, Button, message } from 'antd'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 const { Option } = Select
 
+// 模拟数据
+const mockStudents = [
+  {
+    id: '1',
+    studentName: 'student_wang',
+    className: '一班',
+    examTitle: '前端开发基础测试',
+    score: 95,
+    submitTime: '2025-06-08 08:52:24'
+  },
+  {
+    id: '2',
+    studentName: 'student_chen',
+    className: '二班',
+    examTitle: '前端开发基础测试',
+    score: 75,
+    submitTime: '2025-06-08 09:10:15'
+  }
+]
+
 export default function ScoreManage() {
-  const [scores, setScores] = useState<Score[]>([])
-  const [loading, setLoading] = useState(false)
-  const [selectedExam, setSelectedExam] = useState<string>('')
-  const [exams, setExams] = useState<{ id: string; title: string }[]>([])
+  const [scores, setScores] = useState<any[]>([])
+  const [selectedClass, setSelectedClass] = useState<string>('all')
 
   useEffect(() => {
-    fetchExams()
+    setScores(mockStudents)
   }, [])
 
-  useEffect(() => {
-    if (selectedExam) {
-      fetchScores(selectedExam)
-    }
-  }, [selectedExam])
+  // 班级筛选
+  const filteredScores = selectedClass === 'all'
+    ? scores
+    : scores.filter(s => s.className === selectedClass)
 
-  const fetchExams = async () => {
-    try {
-      const res = await request.get<{ id: string; title: string }[]>('/teacher/exams/simple')
-      setExams(res.data)
-      if (res.data.length > 0) setSelectedExam(res.data[0].id)
-    } catch (error) {
-      // 静默处理错误
-    }
-  }
-
-  const fetchScores = async (examId: string) => {
-    setLoading(true)
-    try {
-      const res = await request.get<Score[]>(`/teacher/scores?examId=${examId}`)
-      setScores(res.data)
-    } catch (error) {
-      // 静默处理错误
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  // 导出 CSV
   const exportScores = () => {
-    // 简单导出CSV
+    if (filteredScores.length === 0) {
+      message.warning('暂无成绩可导出')
+      return
+    }
+
     const csvRows = [
-      ['学生姓名', '试卷名称', '得分', '提交时间'],
-      ...scores.map(s => [s.studentName, s.examTitle, s.score, s.submitTime]),
+      ['学生姓名', '班级', '试卷名称', '得分', '满分', '提交时间'],
+      ...filteredScores.map(s => [
+        s.studentName,
+        s.className,
+        s.examTitle,
+        s.score,
+        100,
+        s.submitTime
+      ]),
     ]
+
     const csvContent = csvRows.map(row => row.join(',')).join('\n')
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.href = url
-    link.setAttribute('download', 'scores.csv')
+    link.download = `成绩导出_${new Date().getTime()}.csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+    message.success('导出成功')
   }
 
+  // 表格列
   const columns = [
     { title: '学生姓名', dataIndex: 'studentName', key: 'studentName' },
+    { title: '班级', dataIndex: 'className', key: 'className' },
     { title: '试卷名称', dataIndex: 'examTitle', key: 'examTitle' },
-    { title: '得分', dataIndex: 'score', key: 'score', render: (score: number) => <strong>{score}</strong> },
+    {
+      title: '得分',
+      dataIndex: 'score',
+      key: 'score',
+      render: (score: number) => (
+        <strong style={{ color: score >= 60 ? '#3f8600' : '#cf1322' }}>
+          {score} / 100 分
+        </strong>
+      )
+    },
     { title: '提交时间', dataIndex: 'submitTime', key: 'submitTime' },
   ]
 
   // 图表数据
-  const chartData = scores.map(s => ({ name: s.studentName, 得分: s.score }))
+  const chartData = filteredScores.map(s => ({
+    name: s.studentName,
+    得分: s.score
+  }))
 
   return (
-    <div>
+    <div style={{ padding: 24 }}>
       <Card title="成绩统计图表" style={{ marginBottom: 24 }}>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="name" />
-            <YAxis />
+            <YAxis domain={[0, 100]} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="得分" fill="#8884d8" />
+            <Bar dataKey="得分" fill="#1890ff" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>
@@ -89,22 +111,21 @@ export default function ScoreManage() {
       <Card title="成绩列表">
         <Space style={{ marginBottom: 16 }}>
           <Select
-            placeholder="选择试卷"
-            value={selectedExam}
-            onChange={setSelectedExam}
+            value={selectedClass}
+            onChange={setSelectedClass}
             style={{ width: 200 }}
           >
-            {exams.map(exam => (
-              <Option key={exam.id} value={exam.id}>{exam.title}</Option>
-            ))}
+            <Option value="all">全部班级</Option>
+            <Option value="一班">一班</Option>
+            <Option value="二班">二班</Option>
           </Select>
           <Button type="primary" onClick={exportScores}>导出CSV</Button>
         </Space>
+
         <Table
           columns={columns}
-          dataSource={scores}
-          rowKey="examId"
-          loading={loading}
+          dataSource={filteredScores}
+          rowKey="id"
           pagination={{ pageSize: 10 }}
         />
       </Card>

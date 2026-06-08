@@ -12,17 +12,19 @@ export interface Question {
   options?: string[]
   answer?: string | string[]
   score: number
+  explanation?: string
 }
 
 export interface Exam {
   id: string
   title: string
-  description: string
+  description?: string
   startTime: string
   endTime: string
   duration: number
   questions: Question[]
   totalScore: number
+  status?: 'draft' | 'not_started' | 'in_progress' | 'ended'
 }
 
 export interface Score {

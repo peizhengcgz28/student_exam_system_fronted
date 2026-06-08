@@ -5,6 +5,7 @@ import AppLayout from '@/components/AppLayout'
 import AdminLayout from '@/components/AdminLayout'
 import Login from '@/pages/auth/Login'
 import Register from '@/pages/auth/Register'
+import AdminRegister from '@/pages/auth/AdminRegister'
 import ExamList from '@/pages/student/ExamList'
 import TakingExam from '@/pages/student/TakingExam'
 import ScoreList from '@/pages/student/ScoreList'
@@ -30,7 +31,9 @@ export const router = createBrowserRouter([
     element: <Navigate to="/dashboard" replace />
   },
   { path: '/login', element: <Login /> },
+  { path: '/login/admin', element: <Login isAdminLogin /> },
   { path: '/register', element: <Register /> },
+  { path: '/register/admin', element: <AdminRegister /> },
   {
     path: '/dashboard',
     element: (

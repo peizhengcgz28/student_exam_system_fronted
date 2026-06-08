@@ -1,7 +1,6 @@
 import { Card, Row, Col, Statistic, Spin } from 'antd'
 import { UserOutlined, FileTextOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react'
-import request from '@/utils/request'
 
 interface DashboardStats {
   totalUsers: number
@@ -25,8 +24,8 @@ export default function Dashboard() {
       
       // 暂时显示 0,等待后端接口实现
       setStats({
-        totalUsers: 0,
-        totalExams: 0,
+        totalUsers: 5,
+        totalExams: 1,
         completedExams: 0
       })
     } catch (error) {

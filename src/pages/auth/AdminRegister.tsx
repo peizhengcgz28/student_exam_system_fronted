@@ -1,44 +1,51 @@
-import { Form, Input, Button, Card, Select } from 'antd'
+import { Form, Input, Button, Card } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { authAPI } from '@/services/auth'
 import { useState } from 'react'
+import { message } from 'antd'
 
-export default function Register() {
+export default function AdminRegister() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
-const onFinish = async (values: any) => {
-  setLoading(true)
-  try {
-    // 构造符合后端 API 要求的参数 
-    const sendParams = {
-      name: values.username,  // 表单字段是 username,但后端需要 name
-      phone: values.phone,
-      password: values.password,
-      role: values.role
-    } as { name: string; phone: string; password: string; role: string }
-    
-    await authAPI.register(sendParams)
-    navigate('/login')
-  } catch (error) {
-    console.error('Register failed:', error)
-  } finally {
-    setLoading(false)
+  const onFinish = async (values: any) => {
+    setLoading(true)
+    try {
+      // 构造符合后端 API 要求的参数 - 固定为 admin 角色
+      const sendParams = {
+        name: values.username,
+        phone: values.phone,
+        password: values.password,
+        role: 'admin'  // 强制设置为管理员
+      } as { name: string; phone: string; password: string; role: string }
+      
+      await authAPI.register(sendParams)
+      message.success('管理员账户注册成功！请登录')
+      navigate('/login/admin')
+    } catch (error: any) {
+      console.error('Admin register failed:', error)
+      message.error(error.response?.data?.detail || '注册失败，请稍后重试')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f0f2f5' }}>
-      <Card title="用户注册" style={{ width: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Card 
+        title="管理员注册" 
+        style={{ width: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+        extra={<span style={{ color: '#ff4d4f', fontSize: '12px' }}>️ 仅限系统管理员使用</span>}
+      >
         <Form onFinish={onFinish} layout="vertical">
 
           {/* 用户名 */}
           <Form.Item 
-            label="用户名"
+            label="管理员用户名"
             name="username" 
-            rules={[{ required: true, message: '请输入用户名' }]}
+            rules={[{ required: true, message: '请输入管理员用户名' }]}
           >
-            <Input placeholder="请输入用户名" size="large" />
+            <Input placeholder="请输入管理员用户名" size="large" />
           </Form.Item>
 
           {/* 手机号 */}
@@ -59,10 +66,11 @@ const onFinish = async (values: any) => {
             name="password" 
             rules={[
               { required: true, message: '请输入密码' },
-              { min: 6, message: '密码至少6位' }
+              { min: 8, message: '密码至少8位' },
+              { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, message: '密码必须包含大小写字母和数字' }
             ]}
           >
-            <Input.Password placeholder="请设置密码（至少6位）" size="large" />
+            <Input.Password placeholder="请设置密码（至少8位，包含大小写字母和数字）" size="large" />
           </Form.Item>
           
           {/* 确认密码 */}
@@ -85,32 +93,15 @@ const onFinish = async (values: any) => {
             <Input.Password placeholder="请再次输入密码" size="large" />
           </Form.Item>
           
-          {/* 身份 */}
-          <Form.Item 
-            label="注册身份"
-            name="role" 
-            initialValue="student"
-            rules={[{ required: true, message: '请选择注册身份' }]}
-          >
-            <Select
-              size="large"
-              placeholder="请选择身份"
-              options={[
-                { value: 'student', label: '学生' },
-                { value: 'teacher', label: '教师' },
-              ]}
-            />
-          </Form.Item>
-          
           <Form.Item>
-            <Button type="primary" htmlType="submit" block size="large" loading={loading}>
-              注册
+            <Button type="primary" htmlType="submit" loading={loading} block size="large">
+              注册管理员账户
             </Button>
           </Form.Item>
           
-          <Button type="link" onClick={() => navigate('/login')} block>
-            已有账号？去登录
-          </Button>
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <a href="/login/admin">已有管理员账户？立即登录</a>
+          </div>
         </Form>
       </Card>
     </div>
